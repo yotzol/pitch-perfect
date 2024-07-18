@@ -1,14 +1,20 @@
 package main
 
 import rl       "vendor:raylib"
+import          "core:c"
+
 
 WINDOW_TITLE    :: "Pitch Perfect"
-WINDOW_W        :: 400
-WINDOW_H        :: 400
+DEFAULT_W_W     :: 400
+DEFAULT_W_H     :: 400
+
+w_w, w_h : c.int
 
 main :: proc()
 {
-    rl.InitWindow(WINDOW_W, WINDOW_H, WINDOW_TITLE)
+    w_w, w_h = DEFAULT_W_W, DEFAULT_W_H
+
+    rl.InitWindow(w_w, w_h, WINDOW_TITLE)
     defer rl.CloseWindow()
 
     rl.SetTargetFPS(60)
@@ -17,19 +23,19 @@ main :: proc()
     defer rl.CloseAudioDevice()
 
     play_note(.A, 1)
-
     for !rl.WindowShouldClose() {
-        for i := 0; i < len(sound_manager.sounds); {
-            if !rl.IsSoundPlaying(sound_manager.sounds[i]) {
-                rl.UnloadSound(sound_manager.sounds[i])
-                ordered_remove(&sound_manager.sounds, i)
-            } else {
-                i += 1
-            }
+        clear_finished_sounds()
+
+        if rl.IsWindowResized() {
+            w_w = rl.GetScreenWidth()
+            w_h = rl.GetScreenHeight()
         }
 
         rl.BeginDrawing()
-        rl.ClearBackground(rl.WHITE)
+        rl.ClearBackground(rl.GRAY)
+
+        draw_piano()
+
         rl.EndDrawing()
     }
 }

@@ -72,3 +72,14 @@ play_note :: proc(note: Note, duration_seconds: f32)
     append(&sound_manager.sounds, sound)
 }
 
+clear_finished_sounds :: proc() 
+{
+    for i := 0; i < len(sound_manager.sounds); {
+        if !rl.IsSoundPlaying(sound_manager.sounds[i]) {
+            rl.UnloadSound(sound_manager.sounds[i])
+            ordered_remove(&sound_manager.sounds, i)
+        } else {
+            i += 1
+        }
+    }
+}
