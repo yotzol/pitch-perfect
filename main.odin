@@ -2,9 +2,6 @@ package main
 
 import rl       "vendor:raylib"
 
-SAMPLE_RATE     :: 48000
-AMPLITUDE       :: 0.2
-
 WINDOW_TITLE    :: "Pitch Perfect"
 WINDOW_W        :: 400
 WINDOW_H        :: 400
@@ -19,14 +16,18 @@ main :: proc()
     rl.InitAudioDevice()
     defer rl.CloseAudioDevice()
 
-    wave := sine_wave(440, 1)
-
-    sound := rl.LoadSoundFromWave(wave)
-    defer    rl.UnloadSound(sound)
-
-    rl.PlaySound(sound)
+    play_note(.A, 1)
 
     for !rl.WindowShouldClose() {
+        for i := 0; i < len(sound_manager.sounds); {
+            if !rl.IsSoundPlaying(sound_manager.sounds[i]) {
+                rl.UnloadSound(sound_manager.sounds[i])
+                ordered_remove(&sound_manager.sounds, i)
+            } else {
+                i += 1
+            }
+        }
+
         rl.BeginDrawing()
         rl.ClearBackground(rl.WHITE)
         rl.EndDrawing()
